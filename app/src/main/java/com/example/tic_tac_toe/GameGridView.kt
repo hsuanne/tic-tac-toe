@@ -5,6 +5,9 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 
+const val GRID_WIDTH = 3
+const val GRID_HEIGHT = 3
+
 class GameGridView : View {
     private val linePaint = Paint()
     private lateinit var circle: Bitmap
@@ -36,8 +39,8 @@ class GameGridView : View {
         // clear the old drawings
         canvas?.drawColor(Color.WHITE)
 
-        drawGridLines(canvas, 3f, 3f, width / 3f, height / 3f)
-        drawSymbols(canvas, 3f, 3f, width / 3f, height / 3f)
+        drawGridLines(canvas, GRID_WIDTH.toFloat(), GRID_HEIGHT.toFloat(), width / 3f, height / 3f)
+        drawSymbols(canvas, GRID_WIDTH.toFloat(), GRID_HEIGHT.toFloat(), width / 3f, height / 3f)
     }
 
     fun setData(gameState: Array<Array<GameSymbol>>) {
