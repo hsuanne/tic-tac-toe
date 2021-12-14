@@ -32,7 +32,7 @@ class GameGridView : View {
     }
 
 
-    private lateinit var gameState: Array<Array<GameSymbol>>
+    private lateinit var gameState: GameGrid
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
@@ -43,7 +43,7 @@ class GameGridView : View {
         drawSymbols(canvas, GRID_WIDTH.toFloat(), GRID_HEIGHT.toFloat(), width / 3f, height / 3f)
     }
 
-    fun setData(gameState: Array<Array<GameSymbol>>) {
+    fun setData(gameState: GameGrid) {
         // save data for drawing
         this.gameState = gameState
 
@@ -77,7 +77,7 @@ class GameGridView : View {
         bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         for (i in 0 .. 2) {
             for (n in 0 .. 2) {
-                val symbol = gameState[i][n]
+                val symbol = gameState.getSymbolAt(GridPosition(i,n))
                 val dstCross = RectF(i*tileWidth, n*tileHeight, (i+1)*tileWidth, (n+1)*tileHeight)
                 val dstCircle = RectF(i*tileWidth+90, n*tileHeight+90, (i+1)*tileWidth, (n+1)*tileHeight)
                 if (symbol == GameSymbol.CIRCLE){
@@ -88,8 +88,4 @@ class GameGridView : View {
             }
         }
     }
-}
-
-enum class GameSymbol {
-    CIRCLE, CROSS
 }
