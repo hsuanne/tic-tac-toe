@@ -27,7 +27,7 @@ class GameGridView : View {
 
         circle = BitmapFactory.decodeResource(resources, R.drawable.circle)
         cross = BitmapFactory.decodeResource(resources, R.drawable.cross)
-        bitmapSrcRect = Rect(0, 0, circle.width, circle.height)
+        bitmapSrcRect = Rect(0, 0, cross.width, cross.height)
         bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     }
 
@@ -73,16 +73,17 @@ class GameGridView : View {
     ) {
         circle = BitmapFactory.decodeResource(resources, R.drawable.circle)
         cross = BitmapFactory.decodeResource(resources, R.drawable.cross)
-        bitmapSrcRect = Rect(0, 0, circle.width, circle.height)
+        bitmapSrcRect = Rect(0, 0, cross.width, cross.height)
         bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         for (i in 0 .. 2) {
             for (n in 0 .. 2) {
                 val symbol = gameState[i][n]
-                val dst = RectF(i*tileWidth+10, n*tileHeight+10, (i+1)*tileWidth-10, (n+1)*tileHeight-10)
+                val dstCross = RectF(i*tileWidth, n*tileHeight, (i+1)*tileWidth, (n+1)*tileHeight)
+                val dstCircle = RectF(i*tileWidth+90, n*tileHeight+90, (i+1)*tileWidth, (n+1)*tileHeight)
                 if (symbol == GameSymbol.CIRCLE){
-                    canvas?.drawBitmap(circle, bitmapSrcRect, dst, bitmapPaint)
+                    canvas?.drawBitmap(circle, bitmapSrcRect, dstCircle, bitmapPaint)
                 } else if (symbol == GameSymbol.CROSS) {
-                    canvas?.drawBitmap(cross, bitmapSrcRect, dst, bitmapPaint)
+                    canvas?.drawBitmap(cross, bitmapSrcRect, dstCross, bitmapPaint)
                 }
             }
         }
