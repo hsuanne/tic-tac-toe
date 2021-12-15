@@ -13,27 +13,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val gameGridView: GameGridView = findViewById(R.id.gameGridView)
+        val gameGridView: InteractiveGridView = findViewById(R.id.gameGridView)
 
         val emptyGrid = GameGrid()
         gameGridView.setData(emptyGrid)
 
-        val userTouchObservable = gameGridView.touches()
-            .filter { it.action == MotionEvent.ACTION_UP }
-            .map {
-                getGridPosition(
-                    it.x, it.y,
-                    gameGridView.width, gameGridView.height,
-                    GRID_WIDTH, GRID_HEIGHT
-                )
-            }
-
-        // keeps the latest GameGrid
-        val gameGridSubject: BehaviorSubject<GameGrid> = BehaviorSubject.createDefault(emptyGrid)
-        userTouchObservable.withLatestFrom(gameGridSubject,
-             { gridPosition, gameGrid -> gameGrid.setSymbolAt(gridPosition, GameSymbol.CIRCLE) })
-            .subscribe(gameGridSubject::onNext)
-
+        val userTouchObservable = gameGridView.getTouchesOnGrid()
+        val gameViewModel = GameViewModel(userTouchObservable)
+        gameViewModel.subscribe()
+        val gameGridSubject = gameViewModel.getGameGrid()
         gameGridSubject
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(gameGridView::setData)
