@@ -8,7 +8,7 @@ import android.view.View
 const val GRID_WIDTH = 3
 const val GRID_HEIGHT = 3
 
-class GameGridView : View {
+open class GameGridView : View {
     private val linePaint = Paint()
     private lateinit var circle: Bitmap
     private lateinit var cross: Bitmap
