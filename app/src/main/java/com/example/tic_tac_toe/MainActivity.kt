@@ -1,11 +1,8 @@
 package com.example.tic_tac_toe
 
 import android.os.Bundle
-import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
-import com.jakewharton.rxbinding4.view.touches
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,9 +18,11 @@ class MainActivity : AppCompatActivity() {
         val userTouchObservable = gameGridView.getTouchesOnGrid()
         val gameViewModel = GameViewModel(userTouchObservable)
         gameViewModel.subscribe()
-        val gameGridSubject = gameViewModel.getGameGrid()
-        gameGridSubject
+        val gameStateSubject = gameViewModel.getGameGrid()
+        gameStateSubject
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(gameGridView::setData)
+            .subscribe {
+                gameGridView.setData(it.getGrid())
+            }
     }
 }

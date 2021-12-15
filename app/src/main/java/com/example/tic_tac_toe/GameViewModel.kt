@@ -4,20 +4,46 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
-class GameViewModel(val userTouchObservable: Observable<GridPosition>) {
+class GameViewModel(
+    private val userTouchObservable: Observable<GridPosition>
+) {
     private val subscriptions = CompositeDisposable()
-    private val gameGridSubject: BehaviorSubject<GameGrid> = BehaviorSubject.createDefault(GameGrid())
+    private val gameStateSubject: BehaviorSubject<GameState> =
+        BehaviorSubject.createDefault(GameState(GameGrid(), GameSymbol.EMPTY))
+    private val playerInTurnSubject: BehaviorSubject<GameSymbol> =
+        BehaviorSubject.create()
 
-    fun getGameGrid(): Observable<GameGrid> {
-        return gameGridSubject.hide()
+    fun getGameGrid(): Observable<GameState> {
+        return gameStateSubject.hide()
     }
 
-    fun subscribe(){
+    fun subscribe() {
+        val gameInfoObservable =
+            Observable.combineLatest(gameStateSubject, playerInTurnSubject, { gameState, symbol ->
+                Pair(gameState, symbol)
+            })
+
         subscriptions.add(
-            userTouchObservable.withLatestFrom(gameGridSubject,
-                { gridPosition, gameGrid ->
-                    gameGrid.setSymbolAt(gridPosition, GameSymbol.CIRCLE) })
-                .subscribe(gameGridSubject::onNext)
+            userTouchObservable.withLatestFrom(gameInfoObservable,
+                { gridPosition, gameInfo ->
+                    val gameState = gameInfo.first
+                    gameState.getNextGameState(gridPosition, gameInfo.second)
+                })
+                .subscribe(gameStateSubject::onNext)
+        )
+
+        subscriptions.add(
+            gameStateSubject
+                .map(GameState::getLastSymbol)
+                .map {
+                    when (it) {
+                        GameSymbol.CIRCLE -> GameSymbol.CROSS
+                        else -> GameSymbol.CIRCLE
+                    }
+                }
+                .subscribe {
+                    playerInTurnSubject.onNext(it)
+                }
         )
     }
 }
