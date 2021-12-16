@@ -12,6 +12,8 @@ class GameViewModel(
         BehaviorSubject.createDefault(GameState(GameGrid(), GameSymbol.EMPTY))
     private val playerInTurnSubject: BehaviorSubject<GameSymbol> =
         BehaviorSubject.create()
+    private val gameStatusSubject: BehaviorSubject<GameStatus> =
+        BehaviorSubject.create()
 
     fun getGameGrid(): Observable<GameState> {
         return gameStateSubject.hide()
@@ -24,7 +26,7 @@ class GameViewModel(
             })
 
         val filteredTouchesEventObservable =
-            userTouchObservable.withLatestFrom(gameStateSubject, {gridPosition, gameState ->
+            userTouchObservable.withLatestFrom(gameStateSubject, { gridPosition, gameState ->
                 Pair(gridPosition, gameState)
             })
                 .filter {
@@ -57,5 +59,21 @@ class GameViewModel(
                 }
         )
 
+        subscriptions.add(
+            gameStateSubject
+                .map {
+                    it.getGrid()
+                }
+                .map {
+                    val winner = calculateWinnerForGrid(it)
+                    if (winner != null) {
+                        GameStatus().ended(winner)
+                    }
+                    GameStatus().ongoing()
+                }
+                .subscribe {
+                    gameStatusSubject.onNext(it)
+                }
+        )
     }
 }
