@@ -13,4 +13,8 @@ class GameState(private val gameGrid: GameGrid, private val lastPlayedSymbol: Ga
     fun getNextGameState(gridPosition: GridPosition, gameSymbol: GameSymbol): GameState {
         return GameState(gameGrid.setSymbolAt(gridPosition, gameSymbol), gameSymbol)
     }
+
+    fun isEmpty(gridPosition: GridPosition): Boolean {
+        return gameGrid.getSymbolAt(gridPosition) == GameSymbol.EMPTY
+    }
 }
