@@ -16,4 +16,18 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+        <TextView
+            android:id="@+id/resultView"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:background="#E6FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
