@@ -23,8 +23,19 @@ class GameViewModel(
                 Pair(gameState, symbol)
             })
 
+        val filteredTouchesEventObservable =
+            userTouchObservable.withLatestFrom(gameStateSubject, {gridPosition, gameState ->
+                Pair(gridPosition, gameState)
+            })
+                .filter {
+                    val gridPosition = it.first
+                    val gameState = it.second
+                    gameState.isEmpty(gridPosition)
+                }
+                .map { it.first }
+
         subscriptions.add(
-            userTouchObservable.withLatestFrom(gameInfoObservable,
+            filteredTouchesEventObservable.withLatestFrom(gameInfoObservable,
                 { gridPosition, gameInfo ->
                     val gameState = gameInfo.first
                     gameState.getNextGameState(gridPosition, gameInfo.second)
@@ -45,5 +56,6 @@ class GameViewModel(
                     playerInTurnSubject.onNext(it)
                 }
         )
+
     }
 }
