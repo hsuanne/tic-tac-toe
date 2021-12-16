@@ -19,6 +19,10 @@ class GameViewModel(
         return gameStateSubject.hide()
     }
 
+    fun getGameStatus(): Observable<GameStatus> {
+        return gameStatusSubject.hide()
+    }
+
     fun subscribe() {
         val gameInfoObservable =
             Observable.combineLatest(gameStateSubject, playerInTurnSubject, { gameState, symbol ->
@@ -59,6 +63,7 @@ class GameViewModel(
                 }
         )
 
+        val gameStatus = GameStatus()
         subscriptions.add(
             gameStateSubject
                 .map {
@@ -67,9 +72,9 @@ class GameViewModel(
                 .map {
                     val winner = calculateWinnerForGrid(it)
                     if (winner != null) {
-                        GameStatus().ended(winner)
+                        gameStatus.ended(winner)
                     }
-                    GameStatus().ongoing()
+                    else gameStatus.ongoing()
                 }
                 .subscribe {
                     gameStatusSubject.onNext(it)

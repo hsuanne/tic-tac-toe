@@ -7,12 +7,12 @@ class GameStatus {
     fun ended(winner: GameSymbol): GameStatus {
         this.isEnded = true
         this.winner = winner
-        return GameStatus()
+        return this
     }
 
     fun ongoing(): GameStatus {
         this.isEnded = false
         this.winner = null
-        return GameStatus()
+        return this
     }
 }
