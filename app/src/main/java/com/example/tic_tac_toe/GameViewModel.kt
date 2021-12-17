@@ -24,6 +24,10 @@ class GameViewModel(
         return gameStatusSubject.hide()
     }
 
+    fun getPlayerInTurn(): Observable<GameSymbol> {
+        return playerInTurnSubject.hide()
+    }
+
     fun subscribe() {
         val gameInfoObservable =
             Observable.combineLatest(gameStateSubject, playerInTurnSubject, { gameState, symbol ->

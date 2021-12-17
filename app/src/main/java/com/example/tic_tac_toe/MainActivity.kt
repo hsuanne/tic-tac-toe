@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
@@ -24,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         val userTouchObservable = gameGridView.getTouchesOnGrid()
         val gameViewModel = GameViewModel(userTouchObservable)
         val resultView: TextView = findViewById(R.id.resultView)
+        val playerView: TextView = findViewById(R.id.playerView)
 
         gameViewModel.subscribe()
 
@@ -34,6 +34,16 @@ class MainActivity : AppCompatActivity() {
                 }
                 .addTo(viewSubscriptions)
 
+        gameViewModel.getPlayerInTurn()
+            .observeOn(AndroidSchedulers.mainThread())
+            .map {
+                if (it == GameSymbol.CIRCLE) "O"
+                else "X"
+            }
+            .subscribe {
+                playerView.text = "Player: $it"
+            }
+            .addTo(viewSubscriptions)
 
 
             gameViewModel.getGameStatus()
