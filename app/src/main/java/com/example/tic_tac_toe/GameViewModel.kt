@@ -2,6 +2,7 @@ package com.example.tic_tac_toe
 
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class GameViewModel(
@@ -29,8 +30,19 @@ class GameViewModel(
                 Pair(gameState, symbol)
             })
 
+        val gameNotEndedTouches =
+            userTouchObservable.withLatestFrom(gameStatusSubject, { gridPosition, gameStatus ->
+                Pair(gridPosition, gameStatus)
+            })
+                .filter {
+                    !it.second.isEnded
+                }
+                .map {
+                    it.first
+                }
+
         val filteredTouchesEventObservable =
-            userTouchObservable.withLatestFrom(gameStateSubject, { gridPosition, gameState ->
+            gameNotEndedTouches.withLatestFrom(gameStateSubject, { gridPosition, gameState ->
                 Pair(gridPosition, gameState)
             })
                 .filter {
@@ -40,16 +52,14 @@ class GameViewModel(
                 }
                 .map { it.first }
 
-        subscriptions.add(
             filteredTouchesEventObservable.withLatestFrom(gameInfoObservable,
                 { gridPosition, gameInfo ->
                     val gameState = gameInfo.first
                     gameState.getNextGameState(gridPosition, gameInfo.second)
                 })
                 .subscribe(gameStateSubject::onNext)
-        )
+                .addTo(subscriptions)
 
-        subscriptions.add(
             gameStateSubject
                 .map(GameState::getLastSymbol)
                 .map {
@@ -61,10 +71,9 @@ class GameViewModel(
                 .subscribe {
                     playerInTurnSubject.onNext(it)
                 }
-        )
+                .addTo(subscriptions)
 
         val gameStatus = GameStatus()
-        subscriptions.add(
             gameStateSubject
                 .map {
                     it.getGrid()
@@ -79,6 +88,11 @@ class GameViewModel(
                 .subscribe {
                     gameStatusSubject.onNext(it)
                 }
-        )
+                .addTo(subscriptions)
+
     }
 }
+
+
+fun Disposable.addTo(compositeDisposable: CompositeDisposable): Disposable
+        = apply { compositeDisposable.add(this) }

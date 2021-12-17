@@ -23,20 +23,19 @@ class MainActivity : AppCompatActivity() {
 
         val userTouchObservable = gameGridView.getTouchesOnGrid()
         val gameViewModel = GameViewModel(userTouchObservable)
-        gameViewModel.subscribe()
-
         val resultView: TextView = findViewById(R.id.resultView)
 
-        viewSubscriptions.add(
+        gameViewModel.subscribe()
+
             gameViewModel.getGameGrid()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     gameGridView.setData(it.getGrid())
                 }
-        )
+                .addTo(viewSubscriptions)
 
 
-        viewSubscriptions.add(
+
             gameViewModel.getGameStatus()
                 .map {
                     it.isEnded
@@ -49,9 +48,8 @@ class MainActivity : AppCompatActivity() {
                 .subscribe {
                     resultView.visibility = it
                 }
-        )
+                .addTo(viewSubscriptions)
 
-        viewSubscriptions.add(
             gameViewModel.getGameStatus()
                 .map {
                     "Winner: ${it.winner}"
@@ -60,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                 .subscribe {
                     resultView.text = it
                 }
-        )
+                .addTo(viewSubscriptions)
     }
 
     override fun onDestroy() {
