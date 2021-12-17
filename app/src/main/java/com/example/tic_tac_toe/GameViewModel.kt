@@ -29,8 +29,19 @@ class GameViewModel(
                 Pair(gameState, symbol)
             })
 
+        val gameNotEndedTouches =
+            userTouchObservable.withLatestFrom(gameStatusSubject, { gridPosition, gameStatus ->
+                Pair(gridPosition, gameStatus)
+            })
+                .filter {
+                    !it.second.isEnded
+                }
+                .map {
+                    it.first
+                }
+
         val filteredTouchesEventObservable =
-            userTouchObservable.withLatestFrom(gameStateSubject, { gridPosition, gameState ->
+            gameNotEndedTouches.withLatestFrom(gameStateSubject, { gridPosition, gameState ->
                 Pair(gridPosition, gameState)
             })
                 .filter {
