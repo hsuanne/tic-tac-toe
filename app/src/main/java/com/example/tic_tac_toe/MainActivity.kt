@@ -1,9 +1,11 @@
 package com.example.tic_tac_toe
 
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.jakewharton.rxbinding4.view.touches
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
@@ -27,12 +29,12 @@ class MainActivity : AppCompatActivity() {
 
         gameViewModel.subscribe()
 
-            gameViewModel.getGameGrid()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    gameGridView.setData(it.getGrid())
-                }
-                .addTo(viewSubscriptions)
+        gameViewModel.getGameGrid()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                gameGridView.setData(it.getGrid())
+            }
+            .addTo(viewSubscriptions)
 
         gameViewModel.getPlayerInTurn()
             .observeOn(AndroidSchedulers.mainThread())
@@ -45,30 +47,31 @@ class MainActivity : AppCompatActivity() {
             }
             .addTo(viewSubscriptions)
 
+        gameViewModel.getGameStatus()
+            .map {
+                it.isEnded
+            }
+            .map {
+                if (it) View.VISIBLE
+                else View.GONE
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                resultView.visibility = it
+            }
+            .addTo(viewSubscriptions)
 
-            gameViewModel.getGameStatus()
-                .map {
-                    it.isEnded
-                }
-                .map {
-                    if (it) View.VISIBLE
-                    else View.GONE
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    resultView.visibility = it
-                }
-                .addTo(viewSubscriptions)
+        gameViewModel.getGameStatus()
+            .map {
+                "Winner: ${it.winner}"
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                resultView.text = it
+            }
+            .addTo(viewSubscriptions)
 
-            gameViewModel.getGameStatus()
-                .map {
-                    "Winner: ${it.winner}"
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    resultView.text = it
-                }
-                .addTo(viewSubscriptions)
+        gameViewModel.restartAtTouch(resultView)
     }
 
     override fun onDestroy() {
