@@ -1,5 +1,9 @@
 package com.example.tic_tac_toe
 
+import android.view.MotionEvent
+import android.view.View
+import android.widget.TextView
+import com.jakewharton.rxbinding4.view.touches
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -26,6 +30,15 @@ class GameViewModel(
 
     fun getPlayerInTurn(): Observable<GameSymbol> {
         return playerInTurnSubject.hide()
+    }
+
+    fun restartAtTouch(textView: TextView) {
+        textView.touches()
+            .filter { it.action == MotionEvent.ACTION_UP }
+            .map { GameState(GameGrid(), GameSymbol.EMPTY) }
+            .subscribe {
+                gameStateSubject.onNext(it)
+            }
     }
 
     fun subscribe() {
