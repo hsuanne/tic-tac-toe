@@ -28,6 +28,15 @@ class GameGrid {
         }
         return GameGrid(newGrid)
     }
+
+    fun isGridFull(): Boolean {
+        for (i in 0..2) {
+            for (n in 0..2) {
+                if(grid[i][n] == GameSymbol.EMPTY) return false
+            }
+        }
+        return true
+    }
 }
 
 enum class GameSymbol {
