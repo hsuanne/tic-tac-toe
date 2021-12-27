@@ -17,4 +17,8 @@ class GameState(private val gameGrid: GameGrid, private val lastPlayedSymbol: Ga
     fun isEmpty(gridPosition: GridPosition): Boolean {
         return gameGrid.getSymbolAt(gridPosition) == GameSymbol.EMPTY
     }
+
+    fun isGridFull(): Boolean {
+        return gameGrid.isGridFull()
+    }
 }

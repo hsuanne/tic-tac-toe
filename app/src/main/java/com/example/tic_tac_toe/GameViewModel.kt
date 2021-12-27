@@ -97,8 +97,9 @@ class GameViewModel(
                 }
                 .map {
                     val winner = calculateWinnerForGrid(it)
-                    if (winner != null) {
-                        gameStatus.ended(winner)
+                    if (winner != null || it.isGridFull()) {
+                        if (winner != null) gameStatus.ended(winner)
+                        else gameStatus.ended(GameSymbol.EMPTY)
                     }
                     else gameStatus.ongoing()
                 }
