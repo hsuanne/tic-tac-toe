@@ -3,6 +3,7 @@ package com.example.tic_tac_toe
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
+import androidx.lifecycle.ViewModel
 import com.jakewharton.rxbinding4.view.touches
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -11,7 +12,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 class GameViewModel(
     private val userTouchObservable: Observable<GridPosition>
-) {
+): ViewModel() {
     private val subscriptions = CompositeDisposable()
     private val gameStateSubject: BehaviorSubject<GameState> =
         BehaviorSubject.createDefault(GameState(GameGrid(), GameSymbol.EMPTY))
@@ -28,6 +29,21 @@ class GameViewModel(
         return gameStatusSubject.hide()
     }
 
+    fun getResultVisibility(): Observable<Boolean> {
+        return gameStatusSubject
+            .map {
+                it.isEnded
+            }
+    }
+
+    fun getPlayerName(): Observable<String> {
+        return playerInTurnSubject
+            .map {
+                if (it == GameSymbol.CIRCLE) "O"
+                else "X"
+            }
+    }
+
     fun getPlayerInTurn(): Observable<GameSymbol> {
         return playerInTurnSubject.hide()
     }
@@ -39,6 +55,16 @@ class GameViewModel(
             .subscribe {
                 gameStateSubject.onNext(it)
             }
+    }
+
+    fun restart() {
+        val stste = GameState(GameGrid(), GameSymbol.EMPTY)
+        gameStateSubject.onNext(stste)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        subscriptions.clear()
     }
 
     fun subscribe() {
@@ -69,26 +95,26 @@ class GameViewModel(
                 }
                 .map { it.first }
 
-            filteredTouchesEventObservable.withLatestFrom(gameInfoObservable,
-                { gridPosition, gameInfo ->
-                    val gameState = gameInfo.first
-                    gameState.getNextGameState(gridPosition, gameInfo.second)
-                })
-                .subscribe(gameStateSubject::onNext)
-                .addTo(subscriptions)
+        filteredTouchesEventObservable.withLatestFrom(gameInfoObservable,
+            { gridPosition, gameInfo ->
+                val gameState = gameInfo.first
+                gameState.getNextGameState(gridPosition, gameInfo.second)
+            })
+            .subscribe(gameStateSubject::onNext)
+            .addTo(subscriptions)
 
-            gameStateSubject
-                .map(GameState::getLastSymbol)
-                .map {
-                    when (it) {
-                        GameSymbol.CIRCLE -> GameSymbol.CROSS
-                        else -> GameSymbol.CIRCLE
-                    }
+        gameStateSubject
+            .map(GameState::getLastSymbol)
+            .map {
+                when (it) {
+                    GameSymbol.CIRCLE -> GameSymbol.CROSS
+                    else -> GameSymbol.CIRCLE
                 }
-                .subscribe {
-                    playerInTurnSubject.onNext(it)
-                }
-                .addTo(subscriptions)
+            }
+            .subscribe {
+                playerInTurnSubject.onNext(it)
+            }
+            .addTo(subscriptions)
 
         val gameStatus = GameStatus()
             gameStateSubject

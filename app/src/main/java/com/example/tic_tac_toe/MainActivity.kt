@@ -5,9 +5,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.jakewharton.rxbinding4.view.clicks
 import com.jakewharton.rxbinding4.view.touches
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,28 +38,18 @@ class MainActivity : AppCompatActivity() {
             }
             .addTo(viewSubscriptions)
 
-        gameViewModel.getPlayerInTurn()
+        gameViewModel.getPlayerName()
             .observeOn(AndroidSchedulers.mainThread())
-            .map {
-                if (it == GameSymbol.CIRCLE) "O"
-                else "X"
-            }
             .subscribe {
                 playerView.text = "Player: $it"
             }
             .addTo(viewSubscriptions)
 
-        gameViewModel.getGameStatus()
-            .map {
-                it.isEnded
-            }
-            .map {
-                if (it) View.VISIBLE
-                else View.GONE
-            }
+        gameViewModel.getResultVisibility()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                resultView.visibility = it
+                if (it) resultView.visibility = View.VISIBLE
+                else resultView.visibility = View.GONE
             }
             .addTo(viewSubscriptions)
 
@@ -71,7 +63,12 @@ class MainActivity : AppCompatActivity() {
             }
             .addTo(viewSubscriptions)
 
-        gameViewModel.restartAtTouch(resultView)
+        resultView.clicks()
+            .throttleFirst(1000,TimeUnit.MILLISECONDS)
+            .subscribe {
+                gameViewModel.restart()
+            }
+            .addTo(viewSubscriptions)
     }
 
     override fun onDestroy() {
