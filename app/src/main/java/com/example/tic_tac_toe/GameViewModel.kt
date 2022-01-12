@@ -39,8 +39,9 @@ class GameViewModel(
     fun getPlayerName(): Observable<String> {
         return playerInTurnSubject
             .map {
-                if (it == GameSymbol.CIRCLE) "O"
-                else "X"
+                if (it == GameSymbol.CIRCLE) "Circle"
+                else if (it == GameSymbol.TRIANGLE) "Triangle"
+                else "Cross"
             }
     }
 
@@ -108,6 +109,7 @@ class GameViewModel(
             .map {
                 when (it) {
                     GameSymbol.CIRCLE -> GameSymbol.CROSS
+                    GameSymbol.CROSS -> GameSymbol.TRIANGLE
                     else -> GameSymbol.CIRCLE
                 }
             }

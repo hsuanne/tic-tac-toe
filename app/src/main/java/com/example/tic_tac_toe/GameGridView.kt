@@ -12,6 +12,8 @@ open class GameGridView : View {
     private val linePaint = Paint()
     private lateinit var circle: Bitmap
     private lateinit var cross: Bitmap
+    private lateinit var triangle: Bitmap
+
     private lateinit var bitmapSrcRect: Rect
     private lateinit var bitmapPaint: Paint
 
@@ -27,6 +29,7 @@ open class GameGridView : View {
 
         circle = BitmapFactory.decodeResource(resources, R.drawable.circle)
         cross = BitmapFactory.decodeResource(resources, R.drawable.cross)
+        triangle = BitmapFactory.decodeResource(resources, R.drawable.triangle)
         bitmapSrcRect = Rect(0, 0, cross.width, cross.height)
         bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     }
@@ -73,6 +76,8 @@ open class GameGridView : View {
     ) {
         circle = BitmapFactory.decodeResource(resources, R.drawable.circle)
         cross = BitmapFactory.decodeResource(resources, R.drawable.cross)
+        triangle = BitmapFactory.decodeResource(resources, R.drawable.triangle)
+
         bitmapSrcRect = Rect(0, 0, cross.width, cross.height)
         bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG)
         for (i in 0 .. 2) {
@@ -84,6 +89,8 @@ open class GameGridView : View {
                     canvas?.drawBitmap(circle, bitmapSrcRect, dstCircle, bitmapPaint)
                 } else if (symbol == GameSymbol.CROSS) {
                     canvas?.drawBitmap(cross, bitmapSrcRect, dstCross, bitmapPaint)
+                } else if (symbol == GameSymbol.TRIANGLE) {
+                    canvas?.drawBitmap(triangle, bitmapSrcRect, dstCircle, bitmapPaint)
                 }
             }
         }
