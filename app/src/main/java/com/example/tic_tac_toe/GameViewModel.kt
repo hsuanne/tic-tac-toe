@@ -40,7 +40,6 @@ class GameViewModel(
         return playerInTurnSubject
             .map {
                 if (it == GameSymbol.CIRCLE) "Circle"
-                else if (it == GameSymbol.TRIANGLE) "Triangle"
                 else "Cross"
             }
     }
@@ -59,8 +58,8 @@ class GameViewModel(
     }
 
     fun restart() {
-        val stste = GameState(GameGrid(), GameSymbol.EMPTY)
-        gameStateSubject.onNext(stste)
+        val state = GameState(GameGrid(), GameSymbol.EMPTY)
+        gameStateSubject.onNext(state)
     }
 
     override fun onCleared() {
@@ -109,7 +108,6 @@ class GameViewModel(
             .map {
                 when (it) {
                     GameSymbol.CIRCLE -> GameSymbol.CROSS
-                    GameSymbol.CROSS -> GameSymbol.TRIANGLE
                     else -> GameSymbol.CIRCLE
                 }
             }

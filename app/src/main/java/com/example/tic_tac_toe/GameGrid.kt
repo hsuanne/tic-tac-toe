@@ -40,5 +40,5 @@ class GameGrid {
 }
 
 enum class GameSymbol {
-    CIRCLE, CROSS, TRIANGLE, EMPTY
+    CIRCLE, CROSS, EMPTY
 }
